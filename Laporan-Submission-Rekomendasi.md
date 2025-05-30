@@ -263,6 +263,7 @@ Content-Based Filtering (CBF) merupakan sistem rekomendasi yang bergantung pada 
 3. Membutuhkan data fitur item yang kaya: Jika hanya sedikit informasi tentang item yang tersedia, sulit untuk membuat representasi item yang meaningful.
 
 #### b. Collaborative Filtering
+Collaborative Filtering (CF) membuat rekomendasi berdasarkan perilaku pengguna lain yang serupa atau kemiripan antar item berdasarkan cara pengguna berinteraksi dengannya.
 ##### Keuntungan Collaborative Filtering
 1. Tidak membutuhkan fitur produk: Collaborative filtering hanya mengandalkan interaksi pengguna (misalnya: rating, klik, review), sehingga tetap bekerja meskipun data produk tidak lengkap. Cocok jika produk tidak punya deskripsi detail atau teks panjang seperti ingredients.
 2. Dapat menemukan hubungan yang tidak eksplisit: Misalnya, "dua produk berbeda jenis tapi sering disukai oleh pengguna yang sama → akan direkomendasikan meskipun kontennya beda". Menemukan pola berbasis perilaku pengguna, bukan sekadar kesamaan konten.
@@ -277,55 +278,156 @@ Content-Based Filtering (CBF) merupakan sistem rekomendasi yang bergantung pada 
 ### 2. Cara Kerja Algoritma
 #### a. Content Based Filtering
 
-1. Membuat Representasi Item (Fitur Item): Ini adalah langkah pertama dan paling penting.  Perlu didefinisikan apa saja "konten" atau fitur yang menggambarkan setiap produk skincare. Berdasarkan data info_produk.csv Anda, fitur yang relevan meliputi:
+##### 1. Membuat Representasi Item (Fitur Item):
+Perlu didefinisikan apa saja "konten" atau fitur yang menggambarkan setiap produk skincare. Berdasarkan data info_produk.csv, fitur yang relevan meliputi:
 
-    - Category: (e.g., Serum, Moisturizer, Cleanser)
-    - Merk: (e.g., Wardah, Emina, Scarlett)
-    - Product Name: Nama produk itu sendiri (kata-kata dalam nama bisa menjadi fitur).
-    - Ingredients (Jika ada): Daftar bahan-bahan dalam produk adalah fitur konten yang sangat kuat (sayangnya, ini tidak ada di info_produk.csv yang Anda gunakan, tetapi idealnya ini akan disertakan).
-    - Price: Harga (meskipun numerik, ini adalah atribut item).
-    - OverallRating: Rating rata-rata (juga atribut item).
-    - Reviewer: Jumlah reviewer (atribut item).
+  - Category: (e.g., Serum, Moisturizer, Cleanser)
+  - Merk: (e.g., Wardah, Emina, Scarlett)
+  - Product Name: Nama produk itu sendiri (kata-kata dalam nama bisa menjadi fitur).
+  - Ingredients (Jika ada): Daftar bahan-bahan dalam produk adalah fitur konten yang sangat kuat (sayangnya, ini tidak ada di info_produk.csv yang Anda gunakan, tetapi idealnya ini akan disertakan).
+  - Price: Harga (meskipun numerik, ini adalah atribut item).
+  - OverallRating: Rating rata-rata (juga atribut item).
+  - Reviewer: Jumlah reviewer (atribut item).
 
-Untuk menggunakan fitur-fitur ini dalam model, perlu mengubahnya menjadi format numerik yang sudah dilakukan pada tahap Data Preparation.
-
-
-2. Membuat Profil Pengguna
-
-  Ada beberapa cara untuk membuat profil preferensi pengguna:
+##### 2. Membuat Profil Pengguna
+Ada beberapa cara untuk membuat profil preferensi pengguna:
 
   - Berdasarkan Item yang Disukai: Profil pengguna dibuat dengan menggabungkan (misalnya, merata-ratakan) vektor fitur dari semua item yang disukai pengguna tersebut (berdasarkan rating tinggi, pembelian, dll.).
   - Berdasarkan Interaksi: Profil bisa berupa representasi item terakhir yang diinteraksi, atau kombinasi dari item yang paling sering atau paling lama diinteraksi.
   - Explicit Feedback: Menggunakan rating eksplisit atau label suka/tidak suka dari pengguna.
   - Implicit Feedback: Menggunakan tindakan pengguna seperti melihat produk, mengklik, menambah ke keranjang, dll.
 
-  Dalam sistem rekomendasi ini, pendekatan yang digunakan sedikit berbeda dan lebih mirip dengan mencari "item serupa" secara langsung berdasarkan fitur item, tanpa membangun profil pengguna eksplisit terlebih dahulu. Ketika memanggil `recommend_products("Nama Produk")`, fungsi tersebut:
+Dalam sistem rekomendasi ini, pendekatan yang digunakan sedikit berbeda dan lebih mirip dengan mencari "item serupa" secara langsung berdasarkan fitur item, tanpa membangun profil pengguna eksplisit terlebih dahulu. Ketika memanggil `recommend_products("Nama Produk")`, fungsi tersebut:
 
-    - Mengambil vektor fitur dari produk yang menjadi input (kosmetik_processed[idx]).
-    - Menghitung kemiripan (menggunakan Cosine Similarity) antara vektor fitur produk input tersebut dan vektor fitur dari semua produk lain dalam dataset (cosine_similarity(kosmetik_processed[idx], kosmetik_processed)).
-    - Mengurutkan produk berdasarkan skor kemiripan dan merekomendasikan produk dengan skor kemiripan tertinggi (selain produk itu sendiri).
-    - Menghasilkan Rekomendasi: Setelah memiliki representasi item dan profil pengguna, sistem dapat merekomendasikan item baru kepada pengguna:
-    - Bandingkan profil pengguna dengan vektor fitur semua item yang belum pernah diinteraksi pengguna.
+  - Mengambil vektor fitur dari produk yang menjadi input (kosmetik_processed[idx]).
+  - Menghitung kemiripan (menggunakan Cosine Similarity) antara vektor fitur produk input tersebut dan vektor fitur dari semua produk lain dalam dataset (cosine_similarity(kosmetik_processed[idx], kosmetik_processed)).
+  - Mengurutkan produk berdasarkan skor kemiripan dan merekomendasikan produk dengan skor kemiripan tertinggi (selain produk itu sendiri).
+  - Menghasilkan Rekomendasi: Setelah memiliki representasi item dan profil pengguna, sistem dapat merekomendasikan item baru kepada pengguna:
+  - Bandingkan profil pengguna dengan vektor fitur semua item yang belum pernah diinteraksi pengguna.
 
-3. Rekomendasikan item yang paling "mirip" dengan profil pengguna.
+##### 3. Rekomendasikan item yang paling "mirip" dengan profil pengguna.
 
-  Dalam sistem ini, rekomendasi dihasilkan dengan menemukan item lain yang memiliki vektor fitur yang sangat mirip dengan item yang menjadi input pengguna. Ini bisa dianggap sebagai sub-tipe CBF yang fokus pada "item-to-item similarity" berdasarkan konten/fitur item. Ini berguna ketika pengguna memilih satu item dan ingin menemukan item lain yang serupa dengannya.
+Dalam sistem ini, rekomendasi dihasilkan dengan menemukan item lain yang memiliki vektor fitur yang sangat mirip dengan item yang menjadi input pengguna. Ini bisa dianggap sebagai sub-tipe CBF yang fokus pada "item-to-item similarity" berdasarkan konten/fitur item. Ini berguna ketika pengguna memilih satu item dan ingin menemukan item lain yang serupa dengannya.
 
 #### 2. Collaborative Filtering
-**Rubrik/Kriteria Tambahan (Opsional)**: 
-- Menyajikan dua solusi rekomendasi dengan algoritma yang berbeda.
-- Menjelaskan kelebihan dan kekurangan dari solusi/pendekatan yang dipilih.
+
+##### 1. Cara Kerja Model SVD
+Model SVD (Matrix Factorization) ini menggabungkan aspek dari User-Based dan Item-Based CF secara implisit melalui faktor-faktor laten. Ini seringkali memberikan kinerja yang lebih baik dan lebih skalabel daripada metode User/Item-Based murni untuk dataset yang besar dan jarang (sparse). Berikut ini alur kerja model SVD dalam sistem rekomendasi skincare:
+
+1. Model mencoba "mengurai" matriks rating pengguna-item menjadi dua matriks yang lebih kecil, yaitu satu matriks pengguna-faktor dan satu matriks item-faktor.
+2. Setiap baris di matriks pengguna-faktor merepresentasikan preferensi pengguna dalam bentuk angka di berbagai "faktor" atau "fitur" laten.
+3. Setiap kolom di matriks item-faktor merepresentasikan sejauh mana item memiliki fitur-fitur laten tersebut.
+4. Rating yang diprediksi untuk pasangan pengguna-item dihitung dengan mengalikan (dot product) vektor laten pengguna dan vektor laten item yang sesuai. Model dilatih untuk meminimalkan error antara rating yang diprediksi dan rating asli.
+
+##### 2. Cara Kerja Sistem Rekomendasi
+Setelah model dilatih, untuk merekomendasikan item kepada pengguna target, model menghitung prediksi rating pengguna tersebut untuk semua item yang belum pernah mereka interaksi menggunakan vektor laten pengguna dan vektor laten setiap item. Item dengan prediksi rating tertinggi kemudian direkomendasikan.
 
 ## Evaluation
-Pada bagian ini Anda perlu menyebutkan metrik evaluasi yang digunakan. Kemudian, jelaskan hasil proyek berdasarkan metrik evaluasi tersebut.
 
-Ingatlah, metrik evaluasi yang digunakan harus sesuai dengan konteks data, problem statement, dan solusi yang diinginkan.
+Untuk mengukur kinerja model collaborative filtering (SVD), dilakukan evaluasi menggunakan teknik **cross-validation** dengan 5 fold. Evaluasi ini dilakukan terhadap kemampuan model dalam memprediksi rating yang diberikan pengguna terhadap produk skincare.
 
-**Rubrik/Kriteria Tambahan (Opsional)**: 
-- Menjelaskan formula metrik dan bagaimana metrik tersebut bekerja.
+### 1. Content Based Filtering
 
-**---Ini adalah bagian akhir laporan---**
+Evaluasi dilakukan secara manual terhadap hasil rekomendasi sistem berbasis **Content-Based Filtering** dengan mengukur **Precision@5**. Evaluasi ini dilakukan dengan membandingkan apakah kategori produk hasil rekomendasi sama dengan kategori produk input.
 
-_Catatan:_
-- _Anda dapat menambahkan gambar, kode, atau tabel ke dalam laporan jika diperlukan. Temukan caranya pada contoh dokumen markdown di situs editor [Dillinger](https://dillinger.io/), [Github Guides: Mastering markdown](https://guides.github.com/features/mastering-markdown/), atau sumber lain di internet. Semangat!_
-- Jika terdapat penjelasan yang harus menyertakan code snippet, tuliskan dengan sewajarnya. Tidak perlu menuliskan keseluruhan kode project, cukup bagian yang ingin dijelaskan saja.
+Rekomendasi dianggap **relevan** apabila produk yang direkomendasikan memiliki **kategori (`Category`) yang sama** dengan produk input.
+
+#### 1. Produk: *Miraculous Refining Serum*
+
+- **Kategori input**: `Serum & Essence`
+- **5 Produk hasil rekomendasi:**
+
+| No | Product                                   | Category         | Merk           | Similarity Score |
+|----|-------------------------------------------|------------------|----------------|------------------|
+| 1  | White Secret Pure Treatment Essence       | Serum & Essence  | Skin Aqua      | 0.407735         |
+| 2  | Water Bank Essence EX                     | Serum & Essence  | Laneige        | 0.400568         |
+| 3  | Perfect Hydrating Treatment Essence       | Serum & Essence  | AVOSKIN        | 0.395607         |
+| 4  | Starting Treatment Essence                | Serum & Essence  | Secret Key     | 0.387034         |
+| 5  | Revitalift Crystal Micro Essence          | Serum & Essence  | L'Oreal Paris  | 0.375794         |
+
+**Relevansi**: Semua 5 produk berada dalam kategori yang sama.  
+**Precision@5** = 5 / 5 = **100%**
+
+#### 2. Produk: *Whitening Face Mask*
+
+- **Kategori input**: `Nose Pack`
+- **5 Produk hasil rekomendasi:**
+
+| No | Product              | Category    | Merk       | Similarity Score |
+|----|----------------------|-------------|------------|------------------|
+| 1  | Nose Pore Strip      | Nose Pack   | Watsons    | 0.803866         |
+| 2  | Nose Pore Strip      | Nose Pack   | Watsons    | 0.658509         |
+| 3  | Zombie Nose Pack     | Nose Pack   | Skin1004   | 0.578419         |
+| 4  | Blackhead Mask       | Nose Pack   | Breylee    | 0.571488         |
+| 5  | Comedo Mask          | Nose Pack   | Envygreen  | 0.552867         |
+
+**Relevansi**: Semua 5 produk berada dalam kategori yang sama.  
+**Precision@5** = 5 / 5 = **100%**
+
+#### Ringkasan Evaluasi
+
+| Produk Input               | Kategori         | Precision@5 |
+|----------------------------|------------------|-------------|
+| Miraculous Refining Serum  | Serum & Essence  | 100%        |
+| Whitening Face Mask        | Nose Pack        | 100%        |
+
+**Rata-rata Precision@5** = (100% + 100%) / 2 = **100%**
+
+Model content-based filtering berhasil memberikan hasil rekomendasi yang **sangat relevan berdasarkan kategori produk**. Ini menunjukkan bahwa representasi fitur produk yang dibentuk melalui preprocessing dan cosine similarity bekerja dengan baik dalam mengidentifikasi kemiripan antar produk.
+
+### 2. Collaborative Filtering
+
+#### 1. Tujuan Evaluasi
+
+Tujuan dari evaluasi ini adalah untuk mengetahui seberapa akurat model dalam memberikan prediksi rating. Evaluasi dilakukan pada data yang telah dibagi menjadi 5 bagian (fold), dan model diuji sebanyak 5 kali — dengan setiap fold bergantian menjadi data uji.
+
+#### 2. Metrik Evaluasi yang Digunakan
+
+Model dievaluasi menggunakan dua metrik regresi utama:
+
+##### 1. **RMSE (Root Mean Squared Error)**
+
+RMSE mengukur rata-rata kesalahan prediksi yang dikuadratkan dan diakarkan. Metrik ini lebih sensitif terhadap outlier karena penalti terhadap kesalahan besar lebih tinggi.
+
+**Formula:**
+
+
+
+$$
+\text{RMSE} = \sqrt{ \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2 }
+$$
+
+**Keterangan:**
+- *y_i* = rating aktual  
+- *ŷ_i* = rating hasil prediksi  
+- *n* = jumlah data
+
+
+> Semakin kecil nilai RMSE, semakin baik akurasi model.
+
+#### 2. **MAE (Mean Absolute Error)**
+
+MAE mengukur rata-rata selisih absolut antara rating yang diprediksi dan rating aktual. Metrik ini lebih stabil terhadap outlier dibanding RMSE.
+
+**Formula:**
+
+$$
+\text{MAE} = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|
+$$
+> Semakin kecil nilai MAE, semakin baik model memprediksi secara konsisten.
+
+### Implementasi Evaluasi
+
+Berikut adalah potongan kode evaluasi yang digunakan:
+
+```python
+from surprise.model_selection import cross_validate
+from surprise import SVD
+
+# Inisialisasi model SVD
+algo = SVD()
+
+# Evaluasi model dengan cross-validation 5-fold
+cross_val_results = cross_validate(algo, data, measures=['RMSE', 'MA
+
+```
