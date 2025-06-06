@@ -322,58 +322,141 @@ Model SVD (Matrix Factorization) ini menggabungkan aspek dari User-Based dan Ite
 ##### 2. Cara Kerja Sistem Rekomendasi
 Setelah model dilatih, untuk merekomendasikan item kepada pengguna target, model menghitung prediksi rating pengguna tersebut untuk semua item yang belum pernah mereka interaksi menggunakan vektor laten pengguna dan vektor laten setiap item. Item dengan prediksi rating tertinggi kemudian direkomendasikan.
 
+### 3. Top-N Recommendation
+#### a. Content-Based Filtering
+
+Sistem rekomendasi menggunakan pendekatan **Content-Based Filtering** dilakukan dengan menghitung kemiripan antar produk berdasarkan fitur:
+- Kategori (Category)
+- Brand (Merk)
+- Nama produk (Product)
+- Harga dan rating (numerik)
+
+Perhitungan dilakukan menggunakan **TF-IDF Vectorizer** untuk teks dan **Cosine Similarity** antar vektor fitur produk.
+
+Berikut hasil rekomendasi produk skincare untuk 2 contoh input:
+
+#### Top-5 Recommendation for: Miraculous Refining Serum
+
+| Product                              | Category         | Merk               | Similarity Score |
+|--------------------------------------|------------------|--------------------|------------------|
+| Miraculous Refining Toner           | Toner            | AVOSKIN            | 0.662910         |
+| Perfect Hydrating Treatment Essence | Serum & Essence  | AVOSKIN            | 0.626814         |
+| Sakura White Booster Serum          | Serum & Essence  | Garnier            | 0.545330         |
+| C White Lightening Serum            | Serum & Essence  | Azarine Cosmetics  | 0.534822         |
+| Brightening Face Serum              | Serum & Essence  | Whitelab           | 0.527533         |
+
+#### Top-5 Recommendation for: Whitening Face Mask
+
+| Product                          | Category   | Merk           | Similarity Score |
+|----------------------------------|------------|----------------|------------------|
+| Peel Off Charcoal Black Head Nose Pack | Nose Pack | Vienna         | 0.834735         |
+| Blackheads Remover               | Nose Pack | Vienna         | 0.753128         |
+| Blackhead Nose Mask              | Nose Pack | Brunbrun Paris | 0.752243         |
+| Magic Pink Blackhead Nose Mask   | Nose Pack | Sophie Martin  | 0.742327         |
+| SHILLS BLACK MASK                | Nose Pack | SHILLS         | 0.741849         |
+
+#### b. Collaborative Filtering
+### Collaborative Filtering
+
+Pendekatan **Collaborative Filtering** digunakan untuk memberikan rekomendasi berdasarkan perilaku pengguna lain yang memiliki kemiripan preferensi. Algoritma yang digunakan adalah **Singular Value Decomposition (SVD)** dari library `surprise`.
+
+Model dilatih menggunakan data rating pengguna dari dataset ulasan.
+
+#### Contoh Output Top-10 Rekomendasi
+
+Berikut rekomendasi produk untuk salah satu pengguna dari dataset:
+
+> **User ID (diambil dari isi kolom `Review`)**:
+> `"Di aku beneran kerja. Melembabkan bgt. Tp gak lebay..."`
+
+Produk yang sudah pernah dinilai:
+- `Perfect 3D Gel`
+
+Top-10 rekomendasi produk skincare untuk pengguna tersebut:
+
+| Produk                                   | Prediksi Rating |
+|------------------------------------------|------------------|
+| Facial Treatment Mask                    | 4.76             |
+| Masquerade Face Mask                     | 4.74             |
+| Makeup Remover Cleansing Oil Sheet       | 4.73             |
+| Himalayan Charcoal Purifying Glow Mask   | 4.72             |
+| Minyak Zaitun                            | 4.72             |
+| Double Whitening                         | 4.71             |
+| Watermelon Glow Mask                     | 4.70             |
+| RNA Power Radical New Age                | 4.69             |
+| Optilash                                 | 4.68             |
+| Teatree Care Solution Essential Mask EX  | 4.66             |
+
+
 ## Evaluation
 
 Untuk mengukur kinerja model collaborative filtering (SVD), dilakukan evaluasi menggunakan teknik **cross-validation** dengan 5 fold. Evaluasi ini dilakukan terhadap kemampuan model dalam memprediksi rating yang diberikan pengguna terhadap produk skincare.
 
 ### 1. Content Based Filtering
 
-Evaluasi dilakukan secara manual terhadap hasil rekomendasi sistem berbasis **Content-Based Filtering** dengan mengukur **Precision@5**. Evaluasi ini dilakukan dengan membandingkan apakah kategori produk hasil rekomendasi sama dengan kategori produk input.
+#### 1. Tujuan Evaluasi
 
-Rekomendasi dianggap **relevan** apabila produk yang direkomendasikan memiliki **kategori (`Category`) yang sama** dengan produk input.
+Evaluasi ini bertujuan untuk mengetahui seberapa relevan sistem dalam merekomendasikan produk skincare yang **mirip** dengan produk input, berdasarkan atribut/fitur produk seperti:
+- Nama produk (Product)
+- Brand (Merk)
+- Kategori produk (Category)
+- Harga dan rating
 
-#### 1. Produk: *Miraculous Refining Serum*
+Evaluasi dilakukan dengan membandingkan **kategori produk input dan kategori hasil rekomendasi**, karena dalam konteks skincare, kategori (misal: `Serum`, `Toner`, `Moisturizer`) adalah indikator penting dari relevansi.
 
-- **Kategori input**: `Serum & Essence`
-- **5 Produk hasil rekomendasi:**
+---
 
-| No | Product                                   | Category         | Merk           | Similarity Score |
-|----|-------------------------------------------|------------------|----------------|------------------|
-| 1  | White Secret Pure Treatment Essence       | Serum & Essence  | Skin Aqua      | 0.407735         |
-| 2  | Water Bank Essence EX                     | Serum & Essence  | Laneige        | 0.400568         |
-| 3  | Perfect Hydrating Treatment Essence       | Serum & Essence  | AVOSKIN        | 0.395607         |
-| 4  | Starting Treatment Essence                | Serum & Essence  | Secret Key     | 0.387034         |
-| 5  | Revitalift Crystal Micro Essence          | Serum & Essence  | L'Oreal Paris  | 0.375794         |
+#### 2. Metrik Evaluasi yang Digunakan
 
-**Relevansi**: Semua 5 produk berada dalam kategori yang sama.  
-**Precision@5** = 5 / 5 = **100%**
+##### **Precision@K**
 
-#### 2. Produk: *Whitening Face Mask*
+Precision@K mengukur **berapa banyak rekomendasi dari K teratas yang dianggap relevan**. Dalam proyek ini, relevansi ditentukan jika produk yang direkomendasikan memiliki **kategori yang sama** dengan produk yang dimasukkan sebagai input.
 
-- **Kategori input**: `Nose Pack`
-- **5 Produk hasil rekomendasi:**
+---
 
-| No | Product              | Category    | Merk       | Similarity Score |
-|----|----------------------|-------------|------------|------------------|
-| 1  | Nose Pore Strip      | Nose Pack   | Watsons    | 0.803866         |
-| 2  | Nose Pore Strip      | Nose Pack   | Watsons    | 0.658509         |
-| 3  | Zombie Nose Pack     | Nose Pack   | Skin1004   | 0.578419         |
-| 4  | Blackhead Mask       | Nose Pack   | Breylee    | 0.571488         |
-| 5  | Comedo Mask          | Nose Pack   | Envygreen  | 0.552867         |
+**Formula:**
 
-**Relevansi**: Semua 5 produk berada dalam kategori yang sama.  
-**Precision@5** = 5 / 5 = **100%**
+$$
+\text{Precision@K} = \frac{Jumlah\_Rekomendasi\_Relevan}{K}
+$$
 
-#### Ringkasan Evaluasi
+**Keterangan:**
+- Rekomendasi dianggap relevan jika `Category`-nya sama dengan produk input.
+- Nilai K yang digunakan dalam proyek ini adalah 5 (Top-5 recommendation).
 
-| Produk Input               | Kategori         | Precision@5 |
-|----------------------------|------------------|-------------|
-| Miraculous Refining Serum  | Serum & Essence  | 100%        |
-| Whitening Face Mask        | Nose Pack        | 100%        |
+> Precision@K yang tinggi menunjukkan bahwa sistem mampu memberikan rekomendasi yang sejenis secara fungsional dan kategori.
 
-**Rata-rata Precision@5** = (100% + 100%) / 2 = **100%**
+---
 
-Model content-based filtering berhasil memberikan hasil rekomendasi yang **sangat relevan berdasarkan kategori produk**. Ini menunjukkan bahwa representasi fitur produk yang dibentuk melalui preprocessing dan cosine similarity bekerja dengan baik dalam mengidentifikasi kemiripan antar produk.
+### Implementasi Evaluasi
+
+Potongan kode yang digunakan untuk menghitung precision:
+
+```python
+def precision_at_k_cbf(data_cleaned, processed_matrix, k=5):
+    total_precision = 0
+    valid_cases = 0
+
+    for positional_idx in range(len(data_cleaned)):
+        row = data_cleaned.iloc[positional_idx]
+        product = row["Product"]
+        kategori_asli = row["Category"]
+
+        rekomendasi = recommend_products(product, data_cleaned, processed_matrix, top_n=k)
+        if rekomendasi is None or rekomendasi.empty:
+            continue
+
+        relevan = rekomendasi["Category"] == kategori_asli
+        precision = relevan.sum() / k
+
+        total_precision += precision
+        valid_cases += 1
+
+    avg_precision = total_precision / valid_cases if valid_cases > 0 else 0
+    print(f"\n📌 Evaluasi Content-Based Filtering — Precision@{k}: {avg_precision:.4f}")
+    return avg_precision
+```
+📌 Evaluasi Content-Based Filtering — Precision@5: 0.7955
 
 ### 2. Collaborative Filtering
 
