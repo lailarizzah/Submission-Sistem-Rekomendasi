@@ -376,16 +376,16 @@ Top-10 rekomendasi produk skincare untuk pengguna tersebut:
 
 | Produk                                   | Prediksi Rating |
 |------------------------------------------|------------------|
-| Facial Treatment Mask                    | 4.76             |
-| Masquerade Face Mask                     | 4.74             |
-| Makeup Remover Cleansing Oil Sheet       | 4.73             |
-| Himalayan Charcoal Purifying Glow Mask   | 4.72             |
-| Minyak Zaitun                            | 4.72             |
-| Double Whitening                         | 4.71             |
-| Watermelon Glow Mask                     | 4.70             |
-| RNA Power Radical New Age                | 4.69             |
-| Optilash                                 | 4.68             |
-| Teatree Care Solution Essential Mask EX  | 4.66             |
+| Facial Treatment Mask                    | 4.86             |
+| Makeup Remover Cleansing Oil Sheet       | 4.80             |
+| AHA 30% + BHA 2% Peeling Solution        | 4.74             |
+| Facial Moiturizing Lotion - PM           | 4.74             |
+| Optilash                                 | 4.70             |
+| Eyelash Serum                            | 4.69             |
+| Conditioning Eyelash Tonic               | 4.67             |
+| Laneige Lip Sleeping Mask (Apple lime)   | 4.67             |
+| Moisture Surge 72-Hour Auto-Replenishing Hydrator| 4.66             |
+| Masquerade Face Mask                     | 4.65             |
 
 
 ## Evaluation
@@ -514,3 +514,21 @@ algo = SVD()
 cross_val_results = cross_validate(algo, data, measures=['RMSE', 'MA
 
 ```
+
+### Hasil Evaluasi Collaborative Filtering
+
+Model SVD dievaluasi menggunakan 5-Fold Cross Validation dengan dua metrik:
+
+- **RMSE (Root Mean Squared Error)**: 1.0258
+- **MAE (Mean Absolute Error)**: 0.8199
+
+Hasil evaluasi per fold adalah sebagai berikut:
+
+| Fold | RMSE   | MAE   |
+|------|--------|-------|
+| 1    | 1.0312 | 0.8283 |
+| 2    | 1.0319 | 0.8252 |
+| 3    | 1.0427 | 0.8284 |
+| 4    | 1.0161 | 0.8159 |
+| 5    | 1.0071 | 0.8015 |
+| **Rata-rata** | **1.0258** | **0.8199** |
