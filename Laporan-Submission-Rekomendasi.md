@@ -385,7 +385,7 @@ Top-10 rekomendasi produk skincare untuk pengguna tersebut:
 | H.D.P Pore-Stamping Black Mask EX        | 4.66             |
 | Facial Moiturizing Lotion - PM           | 4.65             |
 | Conditioning Eyelash Tonic               | 4.63             |
-| acial Treatment Mask                     | 4.63             |
+| Facial Treatment Mask                    | 4.63             |
 
 
 ## Evaluation
