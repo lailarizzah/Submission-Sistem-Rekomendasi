@@ -228,17 +228,17 @@ Berikut adalah tahapan persiapan data sebelum membangun model collaborative filt
 #### a. Pemilihan Data dan Validasi Struktur
 Langkah pertama adalah menyalin data review produk yang sudah dibersihkan dari variabel kosmetik ke `review_data_for_cf`. Setelah itu, dilakukan validasi bahwa tiga kolom penting tersedia:
 
-- Review → mewakili ID pengguna
+- UserName → mewakili ID pengguna
 - Product → mewakili ID item atau produk
 - Rating → nilai penilaian yang diberikan oleh pengguna terhadap produk
 
 Jika salah satu kolom ini tidak tersedia, proses akan dihentikan karena struktur data tidak memenuhi syarat untuk digunakan dalam sistem rekomendasi berbasis collaborative filtering. Selain itu, dicetak informasi dasar mengenai jumlah baris data, jumlah pengguna unik, dan jumlah produk unik untuk memberikan gambaran skala dataset yang akan digunakan.
 
 #### b. Transformasi Format Data ke Library Surprise
-Setelah struktur data valid, dilakukan proses transformasi data agar dapat digunakan oleh library Surprise, yang secara khusus dirancang untuk membangun sistem rekomendasi. Langkah-langkahnya meliputi:
+Setelah data divalidasi, langkah selanjutnya adalah mengubahnya ke format yang dikenali oleh library Surprise, dengan tahapan berikut:
 
-- Penentuan skala rating: dengan mengambil nilai minimum dan maksimum dari kolom Rating untuk mendefinisikan rentang skor yang valid. Ini diperlukan agar `Surprise.Reader` bisa membaca data dengan benar.
-- Konversi ke objek Surprise Dataset: data yang berisi kolom Review, Product, dan Rating diubah menjadi format dataset internal milik Surprise menggunakan `Dataset.load_from_df(...)`.
+- Penentuan skala rating: Sistem menghitung nilai minimum dan maksimum dari kolom Rating, lalu digunakan untuk menentukan skala rating yang valid dalam objek Reader.
+- Konversi ke objek Surprise Dataset: Data yang terdiri dari UserName, Product, dan Rating diubah menjadi format internal milik Surprise dengan `Dataset.load_from_df(...)`.
 
 Hasil dari langkah ini adalah data yang siap untuk digunakan dalam proses pelatihan model collaborative filtering menggunakan algoritma SVD.
 
