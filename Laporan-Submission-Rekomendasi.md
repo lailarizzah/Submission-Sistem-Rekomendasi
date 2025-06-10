@@ -376,16 +376,16 @@ Top-10 rekomendasi produk skincare untuk pengguna tersebut:
 
 | Produk                                   | Prediksi Rating |
 |------------------------------------------|------------------|
-| Facial Treatment Mask                    | 4.86             |
-| Makeup Remover Cleansing Oil Sheet       | 4.80             |
-| AHA 30% + BHA 2% Peeling Solution        | 4.74             |
-| Facial Moiturizing Lotion - PM           | 4.74             |
+| Makeup Remover Cleansing Oil Sheet       | 4.77             |
+| Acne Plast                               | 4.76             |
+| POREfinist anti-shine fresh cleansing oil| 4.76             |
 | Optilash                                 | 4.70             |
-| Eyelash Serum                            | 4.69             |
-| Conditioning Eyelash Tonic               | 4.67             |
-| Laneige Lip Sleeping Mask (Apple lime)   | 4.67             |
-| Moisture Surge 72-Hour Auto-Replenishing Hydrator| 4.66             |
-| Masquerade Face Mask                     | 4.65             |
+| Minyak Zaitun                            | 4.67             |
+| Miraclear Herbal Peeling                 | 4.67             |
+| H.D.P Pore-Stamping Black Mask EX        | 4.66             |
+| Facial Moiturizing Lotion - PM           | 4.65             |
+| Conditioning Eyelash Tonic               | 4.63             |
+| acial Treatment Mask                     | 4.63             |
 
 
 ## Evaluation
@@ -511,7 +511,7 @@ from surprise import SVD
 algo = SVD()
 
 # Evaluasi model dengan cross-validation 5-fold
-cross_val_results = cross_validate(algo, data, measures=['RMSE', 'MA
+cross_val_results = cross_validate(algo, data, measures=['RMSE', 'MAE'], cv=5, verbose=True)
 
 ```
 
@@ -519,16 +519,16 @@ cross_val_results = cross_validate(algo, data, measures=['RMSE', 'MA
 
 Model SVD dievaluasi menggunakan 5-Fold Cross Validation dengan dua metrik:
 
-- **RMSE (Root Mean Squared Error)**: 1.0258
-- **MAE (Mean Absolute Error)**: 0.8199
+- **RMSE (Root Mean Squared Error)**: 1.0222
+- **MAE (Mean Absolute Error)**: 0.8179
 
 Hasil evaluasi per fold adalah sebagai berikut:
 
 | Fold | RMSE   | MAE   |
 |------|--------|-------|
-| 1    | 1.0312 | 0.8283 |
-| 2    | 1.0319 | 0.8252 |
-| 3    | 1.0427 | 0.8284 |
-| 4    | 1.0161 | 0.8159 |
-| 5    | 1.0071 | 0.8015 |
-| **Rata-rata** | **1.0258** | **0.8199** |
+| 1    | 1.0159 | 0.8221 |
+| 2    | 1.0118 | 0.8086 |
+| 3    | 1.0221 | 0.8148 |
+| 4    | 1.0391 | 0.8308 |
+| 5    | 1.0224 | 0.8132 |
+| **Rata-rata** | **1.0222** | **0.8179** |
